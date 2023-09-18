@@ -16,3 +16,10 @@ chmod +x .git/hooks/pre-commit
 3. run  
 `git add` your files and `git commit`. Commit will not be done if haystacks are found in the code.  
 원하는 파일을 `git add`한 뒤에 `git commit`을 하세요. 만약 설정한 단어가 코드에서 발견되면 커밋이 되지 않습니다.
+
+## Thanks to
+
+Name  |  github
+---  |  ---
+minjungk  | [github](https://github.com/iijung)
+jinam  |  [github](https://github.com/bestjinam)
