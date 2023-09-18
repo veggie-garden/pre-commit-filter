@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+# A hook script that checks certain words is in the code during commit
+
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    pre-commit                                         :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: cheseo <cheseo@student.42seoul.kr>         +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/09/18 23:15:55 by cheseo            #+#    #+#              #
+#    Updated: 2023/09/18 23:15:55 by cheseo           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+BOLD_WHITE=$'\033[1;37m'
+BOLD_RED=$'\033[1;31m'
+BOLD_GREEN=$'\033[1;32m'
+RESET=$'\033[0m'
+
+# Add as many filters as you want
+# 필요한만큼 배열 추가하세요
+filters[1]="alloc("
+filters[2]="printf("
+filters[3]="free()"
+
+element_count=${#filters[@]}
+let "element_count = $element_count + 1"
+
+LIST=$(git diff --name-only --cached)
+ERROR_FLAG=0;
+ERROR_LINE="";
+
+echo "${BOLD_WHITE}Start searching...${RESET}"
+for file in $LIST
+do
+    if [ "$file" == '#' ]; then
+        continue
+    fi
+	EXTENSION=$(echo "$file" | grep ".cpp$")
+	if [ "$EXTENSION" != "" ]; then
+		index=1
+		while [ "$index" -lt "$element_count" ]
+		do
+			ERROR_LINE=$(grep -n "${filters[$index]}" $file >&1)
+			if [ "$ERROR_LINE" != "" ]; then
+				ERROR_FLAG=1
+				grep -Hn --color=always "${filters[$index]}" $file >&1
+			fi
+			let "index = $index + 1"
+		done
+	fi
+done
+
+echo ""
+if [ $ERROR_FLAG == 1 ]; then
+	echo "${BOLD_RED}Can't commit, fix errors first.${RESET}"
+	exit 1
+else
+	echo "${BOLD_GREEN}Commited successfully.${RESET}"
+fi
